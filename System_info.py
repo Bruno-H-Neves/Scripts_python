@@ -13,9 +13,9 @@ column1  = [[ sg.Text('Data:', size=(5, 1)),sg.Text( key='-data-', size=(10, 1))
               sg.Text('Hora:', size=(5, 1)),sg.Text( key='-hora-', size=(10, 1)),
               sg.Text('Bateria:',size=(7, 1)),sg.Text( key='-bateria-', size=(5, 1)),],
             [ sg.Frame(layout=[
-            [ sg.Text('Total:', size=(5, 1)), sg.Text('Usada:', size=(5, 1)),sg.Text( key='-ram-', size=(10, 1))],
-            [ sg.Text('?:', size=(5, 1)), sg.Text('?:', size=(5, 1))]
-                              ],title='Ram Total Gbytes',title_color='red', tooltip="Center")]]
+            [ sg.Text('Total:', size=(5, 1)), sg.Text( key='-ram_total-', size=(5, 1)),sg.Text('Used:', size=(5, 1)),sg.Text( key='-ram_used-', size=(5, 1))],
+            [ sg.Text('Ram %:', size=(5, 1)),sg.Text(key='-ram_percent-', size=(5, 1)), sg.Text('Free:', size=(5, 1)), sg.Text(key='-ram_free-', size=(5, 1))]
+                              ],title='Ram Total Mbytes',title_color='red', tooltip="Center")]]
 
 layout   = [[ sg.Menu(menu_def, tearoff=True)],
             [ sg.Column(column1, background_color='lightblue'),sg.Button('Exit', size=(7, 1))]]
@@ -30,7 +30,10 @@ while True:
     battery = psutil.sensors_battery()
     window['-data-'].update(date)
     window['-hora-'].update(hour)
-    window['-ram-'].update(psutil.virtual_memory().used/1000000)
+    window['-ram_total-'].update(f'{psutil.virtual_memory().total/1000000:.0f}')
+    window['-ram_free-'].update(f'{psutil.virtual_memory().free/1000000:.0f}')
+    window['-ram_percent-'].update(psutil.virtual_memory().percent)    
+    window['-ram_used-'].update(f'{psutil.virtual_memory().used/1000000:.0f}')
     window['-bateria-'].update(battery.percent)
     time.sleep(1)
     if event in ('Exit', None):
