@@ -4,7 +4,7 @@ import pytz
 import psutil
 import time
 
-sg.theme('DarkGrey7')
+sg.theme('DarkGrey')
 
 menu_def = [[ '&File', ['&Exit',]],
             [ '&Help',['&Help','&About Us']]]
@@ -20,7 +20,7 @@ column1  = [[ sg.Text('Data:', size=(5, 1)),sg.Text( key='-data-', size=(10, 1))
 layout   = [[ sg.Menu(menu_def, tearoff=True)],
             [ sg.Column(column1, background_color='lightblue'),sg.Button('Exit', size=(7, 1))]]
 
-window = sg.Window('Frame', layout, no_titlebar=True, location=(100,200))
+window = sg.Window('System Information', layout, no_titlebar=False, location=(100,200))
 
 while True:
     event, values = window.read(timeout=0)
