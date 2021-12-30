@@ -2,7 +2,11 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.use('Qt5Agg')
+from PyQt5 import QtCore, QtWidgets
+#from 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -50,6 +54,17 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.comboBox.currentIndexChanged['QString'].connect(self.update)
+        self.themes= ['bmh','classic','dark_backgroud','seaborn','fast','ggplot','grayscale']
+        self.comboBox.addItems(self.themes)
+        self.pushButton.clicked.connect(self.getFile)
+
+    def update(self,value):
+        print("Value from Combo Box:", value)
+    
+    def getFile(self):
+        self.filename=QtWidgets.QFileDialog.getOpenFileName(filter="csv(*.csv)")[0]
+        print('File:',self.filename)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
