@@ -6,7 +6,20 @@ import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('Qt5Agg')
 from PyQt5 import QtCore, QtWidgets
-#from 
+from PyQt5.QtWidgets import QFileDialog
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as Navi
+from matplotlib.figure import Figure
+import seaborn as sns
+import pandas as pd
+import sip 
+
+class MatplotlibCanvas(FigureCanvasQTAgg):
+    def __init__(self,parent=None,width=5,height=4,dpi=120):
+        fig=Figure(figsize=(width,height),dpi=dpi)
+        self.axes=fig.add_subplot(111)
+        super(MatplotlibCanvas,self).__init__(fig)
+        fig.tight_layout()
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -54,6 +67,12 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+        self.filename=''
+        self.canv=MatplotlibCanvas(self)
+        self.df=[]
+        self.toolbar=Navi(self.canv,self.centralwidget)
+        self.horizontalLayout.addWidget(self.toolbar)
         self.comboBox.currentIndexChanged['QString'].connect(self.update)
         self.themes= ['bmh','classic','dark_backgroud','seaborn','fast','ggplot','grayscale']
         self.comboBox.addItems(self.themes)
