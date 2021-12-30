@@ -44,8 +44,8 @@ class Ui_MainWindow(object):
         self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem1)
+        self.spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(self.spacerItem1)
         self.gridLayout.addLayout(self.verticalLayout, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -71,19 +71,54 @@ class Ui_MainWindow(object):
         self.filename=''
         self.canv=MatplotlibCanvas(self)
         self.df=[]
+
         self.toolbar=Navi(self.canv,self.centralwidget)
         self.horizontalLayout.addWidget(self.toolbar)
-        self.comboBox.currentIndexChanged['QString'].connect(self.update)
-        self.themes= ['bmh','classic','dark_backgroud','seaborn','fast','ggplot','grayscale']
+ 
+        self.themes= ['bmh','classic','dark_background','seaborn','fast','ggplot','grayscale']
         self.comboBox.addItems(self.themes)
         self.pushButton.clicked.connect(self.getFile)
+        self.comboBox.currentIndexChanged['QString'].connect(self.update)
+        
 
     def update(self,value):
         print("Value from Combo Box:", value)
-    
+        plt.clf()
+        plt.style.use(value)
+        try:
+            self.horizontalLayout.removeWidget(self.toolbar)
+            self.verticalLayout.removeWidget(self.canv)
+
+            sip.delete(self.toolbar)
+            sip.delete(self.canv)
+            self.toolbar=None
+            self.canv=None
+            self.verticalLayout.removeItem(self.spacerItem1)
+        except Exception as e:
+            print(e)
+            pass
+        self.canv=MatplotlibCanvas(self)
+        self.toolbar=Navi(self.canv,self.centralwidget)
+        self.horizontalLayout.addWidget(self.toolbar)
+        self.verticalLayout.addWidget(self.canv)
+        self.canv.axes.cla()
+        ax=self.canv.axes
+        self.df.plot(ax=self.canv.axes)
+        legend=ax.legend()
+        legend.set_draggable(True)
+        ax.set_xlabel('X axis')
+        ax.set_ylabel('Y axis')
+        ax.set_title('Title')
+        self.canv.draw()
+
     def getFile(self):
-        self.filename=QtWidgets.QFileDialog.getOpenFileName(filter="csv(*.csv)")[0]
+        self.filename=QFileDialog.getOpenFileName(filter="csv (*.csv)")[0]
         print('File:',self.filename)
+        self.readData()
+
+    def readData(self):
+        self.df=pd.read_csv(self.filename, encoding='utf-8').fillna(0)
+        self.update(self.themes[0])
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
