@@ -16,17 +16,37 @@ from functools import partial
 
 __version__ = '0.1'
 __author__ = 'Leodanis Pozo Ramos'
+ERROR_MSG = 'ERROR'
 
+def evaluateExpression(expression):
+    """Evaluate an expression."""
+    try:
+        result = str(eval(expression, {}, {}))
+    except Exception:
+        result = ERROR_MSG
+
+    return result
+
+# Create a Controller class to connect the GUI and the model
 class PyCalcCtrl:
-    """PyCalc Controller class."""
-    def __init__(self, view):
+    """PyCalc's Controller."""
+    def __init__(self, model, view):
         """Controller initializer."""
+        self._evaluate = model
         self._view = view
         # Connect signals and slots
         self._connectSignals()
 
+    def _calculateResult(self):
+        """Evaluate expressions."""
+        result = self._evaluate(expression=self._view.displayText())
+        self._view.setDisplayText(result)
+
     def _buildExpression(self, sub_exp):
         """Build expression."""
+        if self._view.displayText() == ERROR_MSG:
+            self._view.clearDisplay()
+
         expression = self._view.displayText() + sub_exp
         self._view.setDisplayText(expression)
 
@@ -36,6 +56,8 @@ class PyCalcCtrl:
             if btnText not in {'=', 'C'}:
                 btn.clicked.connect(partial(self._buildExpression, btnText))
 
+        self._view.buttons['='].clicked.connect(self._calculateResult)
+        self._view.display.returnPressed.connect(self._calculateResult)
         self._view.buttons['C'].clicked.connect(self._view.clearDisplay)
 
 # Create a subclass of QMainWindow to setup the calculator's GUI
@@ -117,15 +139,15 @@ class PyCalcUi(QMainWindow):
 # Client code
 def main():
     """Main function."""
-    # Create an instance of QApplication
+    # Create an instance of `QApplication`
     pycalc = QApplication(sys.argv)
     # Show the calculator's GUI
     view = PyCalcUi()
     view.show()
     # Create instances of the model and the controller
-    PyCalcCtrl(view=view)
-
-    # Execute the calculator's main loop
+    model = evaluateExpression
+    PyCalcCtrl(model=model, view=view)
+    # Execute calculator's main loop
     sys.exit(pycalc.exec_())
 
 if __name__ == '__main__':
