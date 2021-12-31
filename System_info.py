@@ -35,9 +35,7 @@ while True:
     window['-ram_percent-'].update(psutil.virtual_memory().percent)    
     window['-ram_used-'].update(f'{psutil.virtual_memory().used/1000000:.0f}')
     window['-bateria-'].update(battery.percent)
-    time.sleep(1)
     if event in ('Exit', None):
         break
+    time.sleep(1)
 
-
-    
